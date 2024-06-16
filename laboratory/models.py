@@ -28,3 +28,15 @@ class Doctor(models.Model):
 
     def __str__(self):
         return f"Dr. {self.first_name} {self.last_name}"
+
+class DiagnosisReport(models.Model):
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+    medical_image = models.ForeignKey(MedicalImage, on_delete=models.CASCADE)
+    report_date = models.DateTimeField(auto_now_add=True)
+    diagnosis = models.TextField()
+    comments = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Diagnosis Report for {self.patient} by {self.doctor} on {self.report_date}"
+
