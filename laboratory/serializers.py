@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Patient, MedicalImage, Doctor, DiagnosisReport
+from .models import Patient, MedicalImage, Doctor, DiagnosisReport, Hospital
 
 class PatientSerializer(serializers.ModelSerializer):
     class Meta :
@@ -20,3 +20,8 @@ class DiagnosisReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = DiagnosisReport
         fields = ['id', 'patient', 'doctor', 'medical_image', 'report_date', 'diagnosis', 'comments']
+
+class HospitalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Hospital
+        fields = '__all__'
