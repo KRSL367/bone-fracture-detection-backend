@@ -4,4 +4,4 @@ from laboratory.models import Hospital
 
 class User(AbstractUser):
     email = models.EmailField(unique=True)
-    hospital_id = models.ForeignKey(Hospital, null=True, blank=True, on_delete=models.SET_NULL)
+    hospital_id = models.OneToOneField(Hospital, null=True, blank=True, on_delete=models.SET_NULL)
