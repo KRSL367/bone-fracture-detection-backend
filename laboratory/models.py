@@ -1,14 +1,13 @@
 from django.db import models
+from django.conf import settings 
 
 class Patient(models.Model):
-    first_name = models.CharField(max_length= 255)
-    last_name = models.CharField(max_length= 255)
-    email = models.EmailField()
     phone = models.CharField(max_length=255)
     birth_date = models.DateField()
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return self.user.username
     
 class MedicalImage(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='medical_images')
@@ -17,7 +16,7 @@ class MedicalImage(models.Model):
     diagnosis = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
-        return f"Image {self.id} for {self.patient.first_name} {self.patient.last_name}"
+        return f"Image {self.id} for {self.user.first_name} {self.user.last_name}"
 
 class Doctor(models.Model):
     first_name = models.CharField(max_length=255)

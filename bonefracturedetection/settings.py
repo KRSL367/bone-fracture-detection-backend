@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 from dotenv import load_dotenv;
+from datetime import timedelta
 
 import os;
 
@@ -47,8 +48,10 @@ INSTALLED_APPS = [
     'rest_framework',
     'debug_toolbar',
     'drf_yasg',
+    'djoser',
     #Local apps
     'laboratory',
+    'core',
 ]
 
 MIDDLEWARE = [
@@ -152,3 +155,19 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
+
+REST_FRAMEWORK = {
+    "COERCE_DECIMAL_TO_STRING": False,
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+}
+
+SIMPLE_JWT = {"AUTH_HEADER_TYPES": ("JWT",),
+              "ACCESS_TOKEN_LIFETIME": timedelta(days=10)
+}
+
+AUTH_USER_MODEL = "core.User"
+
+JOSER = {"SERIALIZERS": {"user_create": "core.serializers.UserCreateSerializer",
+                         "current_user": "core.serializers.UserSerializer"}}
