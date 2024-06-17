@@ -1,5 +1,11 @@
 from rest_framework import serializers
-from .models import Patient, MedicalData, DiagnosisReport, Hospital
+from .models import Patient, MedicalData, DiagnosisReport, Hospital, MedicalDataImages, DiagnosisReportImages
+
+class HospitalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Hospital
+        fields = ['id','name', 'phone']
+        read_only_fields = ['id']
 
 class PatientSerializer(serializers.ModelSerializer):
     class Meta :
@@ -11,13 +17,18 @@ class MedicalDataSerializer(serializers.ModelSerializer):
         model = MedicalData
         fields = ['id', 'patient', 'uploaded_at', 'diagnosis']
 
+class MedicalDataImagesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MedicalDataImages
+        fields = ['id', 'image', 'medical_data']
+
 class DiagnosisReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = DiagnosisReport
         fields = ['id', 'patient', 'doctor', 'report_date', 'diagnosis', 'comments']
 
-class HospitalSerializer(serializers.ModelSerializer):
+class DiagnosisReportImageSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Hospital
-        fields = ['id','name', 'phone']
-        read_only_fields = ['id']
+        model = DiagnosisReportImages
+        fields = ['id', 'image', 'diagnosis_report']
+

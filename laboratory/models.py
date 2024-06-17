@@ -41,6 +41,6 @@ class DiagnosisReport(models.Model):
     def __str__(self):
         return f"Report {self.id} for {self.medical_data}"
 
-class DiagnosisReportImage(models.Model):
+class DiagnosisReportImages(models.Model):
     image = models.ImageField(upload_to='report_images/')
     diagnosis_report = models.ForeignKey(DiagnosisReport, related_name='diagnosis_images', on_delete=models.CASCADE)
