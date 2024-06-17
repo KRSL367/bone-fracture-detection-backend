@@ -2,7 +2,18 @@ from django.db import models
 from django.conf import settings 
 from uuid import uuid4
 
+class Hospital(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4)
+    name = models.CharField(max_length=255)
+    phone = models.CharField(max_length=255)
+    
+    def __str__(self):
+        return self.name
+
 class Patient(models.Model):
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    email = models.EmailField(unique=True)
     phone = models.CharField(max_length=255)
     birth_date = models.DateField()
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -40,10 +51,4 @@ class DiagnosisReport(models.Model):
     def __str__(self):
         return f"Diagnosis Report for {self.patient} by {self.doctor} on {self.report_date}"
 
-class Hospital(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid4)
-    name = models.CharField(max_length=255)
-    phone = models.CharField(max_length=255)
-    
-    def __str__(self):
-        return self.name
+
