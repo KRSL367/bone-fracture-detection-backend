@@ -10,7 +10,7 @@ class HospitalSerializer(serializers.ModelSerializer):
 class PatientSerializer(serializers.ModelSerializer):
     class Meta :
         model = Patient
-        fields = ['first_name', 'last_name', 'email', 'phone', 'birth_date', 'hospital']
+        fields = ['id','first_name', 'last_name', 'email', 'phone', 'birth_date', 'hospital']
 
 class MedicalDataSerializer(serializers.ModelSerializer):
     class Meta:
