@@ -4,4 +4,8 @@ from laboratory.models import Hospital
 
 class User(AbstractUser):
     email = models.EmailField(unique=True)
-    hospital_id = models.OneToOneField(Hospital, null=True, blank=True, on_delete=models.SET_NULL)
+    is_hospital_admin = models.BooleanField(default=False)
+    hospital = models.OneToOneField(Hospital, related_name='users', null=True, blank=True, on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return self.username
