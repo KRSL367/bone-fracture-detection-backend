@@ -4,7 +4,6 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     PatientViewSet,
     MedicalImageViewSet,
-    DoctorViewSet,
     DiagnosisReportViewSet,
     HospitalViewSet,
 )
@@ -13,7 +12,6 @@ from .views import (
 router = DefaultRouter()
 router.register("patients", PatientViewSet, basename="patient")
 router.register("medical-images", MedicalImageViewSet, basename="medicalimage")
-router.register("doctors", DoctorViewSet, basename="doctor")
 router.register("diagnosis-reports", DiagnosisReportViewSet)
 router.register("hospitals", HospitalViewSet, basename="hospital")
 
