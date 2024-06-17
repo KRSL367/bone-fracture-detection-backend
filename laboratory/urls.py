@@ -3,11 +3,10 @@ from django.urls import path, include
 from rest_framework_nested import routers
 from .views import (
     PatientViewSet,
-    MedicalImageViewSet,
+    MedicalDataViewSet,
     DiagnosisReportViewSet,
     HospitalViewSet,
 )
-
 
 # router = DefaultRouter()
 # router.register("patients", PatientViewSet, basename="patient")
@@ -21,17 +20,20 @@ router.register("hospitals", HospitalViewSet, basename="hospital")
 hospital_router = routers.NestedDefaultRouter(router, "hospitals", lookup="hospital")
 hospital_router.register("patients", PatientViewSet, basename="hospital-patients")
 
-patient_router = routers.NestedDefaultRouter(hospital_router, "patients", lookup="patient")
-patient_router.register("medical-images", MedicalImageViewSet, basename="patient-medical-images")
+patient_router = routers.NestedDefaultRouter(
+    hospital_router, "patients", lookup="patient"
+)
+patient_router.register(
+    "medical-datas", MedicalDataViewSet, basename="patient-medical-data"
+)
 
-medical_image_router = routers.NestedDefaultRouter(patient_router, "medical-images", lookup="medical_image")
-medical_image_router.register("diagnosis-reports", DiagnosisReportViewSet, basename="medical-image-diagnosis-reports")
+medical_data_router = routers.NestedDefaultRouter(
+    patient_router, "medical-datas", lookup="medical_data"
+)
+medical_data_router.register(
+    "diagnosis-reports",
+    DiagnosisReportViewSet,
+    basename="medical-data-diagnosis-reports",
+)
 
-
-
-urlpatterns = [
-    path("", include(router.urls)),
-    path("", include(hospital_router.urls)),
-    path("", include(patient_router.urls)),
-    path("", include(medical_image_router.urls)),
-]
+urlpatterns = router.urls + hospital_router.urls + patient_router.urls + medical_data_router.urls 

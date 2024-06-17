@@ -1,5 +1,4 @@
 from django.db import models
-from django.conf import settings 
 from uuid import uuid4
 
 class Hospital(models.Model):
@@ -21,20 +20,27 @@ class Patient(models.Model):
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
     
-class MedicalImage(models.Model):
+class MedicalData(models.Model):
     patient = models.ForeignKey(Patient, related_name='medical_images', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='medical_images/')
+    description = models.TextField()
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Image {self.id} for {self.patient}"
 
+class MedicalDataImages(models.Model):
+    image = models.ImageField(upload_to='medical_images/')
+    medical_data = models.ForeignKey(MedicalData, related_name='medical_image', on_delete=models.CASCADE)
+    
+
 class DiagnosisReport(models.Model):
-    medical_image = models.OneToOneField(MedicalImage, related_name='diagnosis_report', on_delete=models.CASCADE)
+    medical_data = models.OneToOneField(MedicalData, related_name='diagnosis_report', on_delete=models.CASCADE)
     report = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-    doctor = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='diagnosis_reports', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return f"Report {self.id} for {self.medical_image}"
+        return f"Report {self.id} for {self.medical_data}"
 
+class DiagnosisReportImage(models.Model):
+    image = models.ImageField(upload_to='report_images/')
+    diagnosis_report = models.ForeignKey(DiagnosisReport, related_name='diagnosis_images', on_delete=models.CASCADE)

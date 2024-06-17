@@ -1,22 +1,23 @@
 from rest_framework import serializers
-from .models import Patient, MedicalImage, DiagnosisReport, Hospital
+from .models import Patient, MedicalData, DiagnosisReport, Hospital
 
 class PatientSerializer(serializers.ModelSerializer):
     class Meta :
         model = Patient
-        fields = '__all__'
+        fields = ['first_name', 'last_name', 'email', 'phone', 'birth_data']
 
-class MedicalImageSerializer(serializers.ModelSerializer):
+class MedicalDataSerializer(serializers.ModelSerializer):
     class Meta:
-        model = MedicalImage
-        fields = ['id', 'patient', 'image', 'uploaded_at', 'diagnosis']
+        model = MedicalData
+        fields = ['id', 'patient', 'uploaded_at', 'diagnosis']
 
 class DiagnosisReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = DiagnosisReport
-        fields = ['id', 'patient', 'doctor', 'medical_image', 'report_date', 'diagnosis', 'comments']
+        fields = ['id', 'patient', 'doctor', 'report_date', 'diagnosis', 'comments']
 
 class HospitalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hospital
-        fields = '__all__'
+        fields = ['id','name', 'phone']
+        read_only_fields = ['id']
