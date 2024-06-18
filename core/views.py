@@ -1,3 +1,6 @@
-from django.shortcuts import render
+# core/views.py
+from djoser.views import UserViewSet as DjoserUserViewSet
+from rest_framework.permissions import IsAuthenticated
 
-# Create your views here.
+class UserViewSet(DjoserUserViewSet):
+    permission_classes = [IsAuthenticated]
