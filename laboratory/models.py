@@ -19,19 +19,18 @@ class Patient(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
-    
+
 class MedicalData(models.Model):
-    patient = models.ForeignKey(Patient, related_name='medical_images', on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient, related_name='medical_datas', on_delete=models.CASCADE)
     description = models.TextField()
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Image {self.id} for {self.patient}"
+        return f"Data {self.id} for {self.patient}"
 
 class MedicalDataImages(models.Model):
     image = models.ImageField(upload_to='medical_images/')
-    medical_data = models.ForeignKey(MedicalData, related_name='medical_image', on_delete=models.CASCADE)
-    
+    medical_data = models.ForeignKey(MedicalData, related_name='images', on_delete=models.CASCADE)
 
 class DiagnosisReport(models.Model):
     medical_data = models.OneToOneField(MedicalData, related_name='diagnosis_report', on_delete=models.CASCADE)
