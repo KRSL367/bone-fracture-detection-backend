@@ -3,10 +3,9 @@ from .models import Hospital, Patient, MedicalData, MedicalDataImages, Diagnosis
 from core.models import User
 
 class HospitalSerializer(serializers.ModelSerializer):
-    admin = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), allow_null=True, required=False)
     class Meta:
         model = Hospital
-        fields = ['id', 'name', 'phone', 'admin']
+        fields = ['id', 'name', 'phone']
 
 class PatientSerializer(serializers.ModelSerializer):
     class Meta:
