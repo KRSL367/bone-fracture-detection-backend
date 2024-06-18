@@ -1,10 +1,12 @@
 from django.db import models
+from django.contrib.auth import get_user_model
 from uuid import uuid4
 
 class Hospital(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4)
     name = models.CharField(max_length=255)
     phone = models.CharField(max_length=255)
+    admins = models.ManyToManyField(get_user_model(), related_name='administered_hospitals')
     
     def __str__(self):
         return self.name
