@@ -9,7 +9,7 @@ from .serializers import (
     DiagnosisReportImageSerializer
 )
 from .permissions import IsHospitalAdmin
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 
 class HospitalViewSet(viewsets.ModelViewSet):
     queryset = Hospital.objects.all()
