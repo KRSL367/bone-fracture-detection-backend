@@ -1,4 +1,3 @@
-# views.py
 from rest_framework import viewsets
 from .models import Patient, MedicalData, DiagnosisReport, Hospital, MedicalDataImages, DiagnosisReportImages
 from .serializers import (
@@ -10,11 +9,10 @@ from .serializers import (
     DiagnosisReportImageSerializer
 )
 
-
 class HospitalViewSet(viewsets.ModelViewSet):
     queryset = Hospital.objects.all()
     serializer_class = HospitalSerializer
-    
+
 class PatientViewSet(viewsets.ModelViewSet):
     serializer_class = PatientSerializer
 
@@ -37,8 +35,7 @@ class DiagnosisReportViewSet(viewsets.ModelViewSet):
     serializer_class = DiagnosisReportSerializer
 
     def get_queryset(self):
-        return DiagnosisReport.objects.filter(medical_image_id=self.kwargs['medical_image_pk'])
-
+        return DiagnosisReport.objects.filter(medical_data_id=self.kwargs['medical_data_pk'])
 
 class DiagnosisReportImageViewSet(viewsets.ModelViewSet):
     serializer_class = DiagnosisReportImageSerializer

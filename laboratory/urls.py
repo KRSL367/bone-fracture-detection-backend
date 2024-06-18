@@ -33,7 +33,7 @@ diagnosis_report_router = routers.NestedDefaultRouter(
     medical_data_router, "diagnosis-reports", lookup="diagnosis_report"
 )
 diagnosis_report_router.register(
-    "images", DiagnosisReportImageViewSet, basename="diagnosis-report-images"
+    "diagnosis-images", DiagnosisReportImageViewSet, basename="diagnosis-report-images"
 )
 
 urlpatterns = router.urls + hospital_router.urls + patient_router.urls + medical_data_router.urls + diagnosis_report_router.urls
