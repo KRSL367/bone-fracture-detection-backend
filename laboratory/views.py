@@ -33,7 +33,6 @@ class MedicalDataImagesViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return MedicalDataImages.objects.filter(medical_data_id=self.kwargs['medical_data_pk'])
 
-
 class DiagnosisReportViewSet(viewsets.ModelViewSet):
     serializer_class = DiagnosisReportSerializer
 
