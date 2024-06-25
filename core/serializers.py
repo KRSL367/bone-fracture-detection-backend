@@ -38,6 +38,7 @@ from djoser.serializers import (
 from rest_framework import serializers
 from .models import User
 from laboratory.models import Hospital
+from laboratory.serializers import HospitalSerializer
 
 class UserCreateSerializer(BaseUserCreateSerializer):
     hospital_name = serializers.CharField(write_only=True, required=True)
@@ -70,12 +71,11 @@ class UserCreateSerializer(BaseUserCreateSerializer):
         return super().create(validated_data)
 
 class UserSerializer(BaseUserSerializer):
-    hospital_name = serializers.CharField(source='hospital.name', read_only=True)
+    hospital = HospitalSerializer(read_only =True)
 
     class Meta(BaseUserSerializer.Meta):
         model = User
-        fields = ["id", "username", "email", "first_name", "last_name", "hospital_name"]
-        read_only_fields = ['hospital_name']
+        fields = ["id", "username", "email", "first_name", "last_name", "hospital"]
 
 
 
