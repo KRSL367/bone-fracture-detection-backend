@@ -33,7 +33,7 @@ class MedicalDataImages(models.Model):
     medical_data = models.ForeignKey(MedicalData, related_name='images', on_delete=models.CASCADE)
 
 class DiagnosisReport(models.Model):
-    medical_data = models.OneToOneField(MedicalData, related_name='diagnosis_report', on_delete=models.CASCADE)
+    medical_data = models.ForeignKey(MedicalData, related_name='diagnosis_report', on_delete=models.CASCADE)
     report = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 

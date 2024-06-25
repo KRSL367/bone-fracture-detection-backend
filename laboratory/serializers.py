@@ -7,27 +7,35 @@ class HospitalSerializer(serializers.ModelSerializer):
         model = Hospital
         fields = ['id', 'name', 'phone']
 
-class PatientSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Patient
-        fields = ['id', 'first_name', 'last_name', 'email', 'phone', 'birth_date', 'hospital']
-
-class MedicalDataSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MedicalData
-        fields = ['id', 'patient', 'description', 'uploaded_at']
-
 class MedicalDataImagesSerializer(serializers.ModelSerializer):
     class Meta:
         model = MedicalDataImages
         fields = ['id', 'image', 'medical_data']
 
-class DiagnosisReportSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DiagnosisReport
-        fields = ['id', 'medical_data', 'report', 'created_at']
-
 class DiagnosisReportImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = DiagnosisReportImages
         fields = ['id', 'image', 'diagnosis_report']
+        
+class DiagnosisReportSerializer(serializers.ModelSerializer):
+    diagnosis_images = DiagnosisReportImageSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = DiagnosisReport
+        fields = ['id', 'medical_data', 'report', 'created_at', 'diagnosis_images']
+
+class MedicalDataSerializer(serializers.ModelSerializer):
+    images = MedicalDataImagesSerializer(many=True, read_only=True)
+    diagnosis_report = DiagnosisReportSerializer(read_only = True, many = True)
+    
+    class Meta:
+        model = MedicalData
+        fields = ['id', 'patient', 'description', 'uploaded_at', 'images', 'diagnosis_report']
+
+class PatientSerializer(serializers.ModelSerializer):
+    medical_datas = MedicalDataSerializer(many=True, read_only=True)
+    hospital = HospitalSerializer(read_only=True)
+    
+    class Meta:
+        model = Patient
+        fields = ['id', 'first_name', 'last_name', 'email', 'phone', 'birth_date', 'medical_datas', 'hospital']
