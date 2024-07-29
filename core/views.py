@@ -2,7 +2,8 @@ from djoser.views import UserViewSet as DjoserUserViewSet
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import UserSerializer, UserCreateSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import CustomTokenCreateSerializer, UserSerializer, UserCreateSerializer
 from .permissions import IsHospitalAdmin
 from .models import User
 
@@ -33,3 +34,6 @@ class UserViewSet(DjoserUserViewSet):
 
     def perform_create(self, serializer):
         serializer.save()
+        
+class CustomTokenCreateView(TokenObtainPairView):
+    serializer_class = CustomTokenCreateSerializer
