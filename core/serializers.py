@@ -15,7 +15,7 @@ class UserCreateSerializer(BaseUserCreateSerializer):
 
     class Meta(BaseUserCreateSerializer.Meta):
         model = User
-        fields = ["id", "username", "password", "email", "first_name", "last_name", "hospital_name"]
+        fields = ["id","first_name", "last_name", "username",  "email", "password", "hospital_name"]
 
     def validate(self, attrs):
         request = self.context.get('request')
@@ -45,7 +45,7 @@ class UserSerializer(BaseUserSerializer):
 
     class Meta(BaseUserSerializer.Meta):
         model = User
-        fields = ["id", "username", "email", "first_name", "last_name", "hospital"]
+        fields = ["id", "first_name", "last_name","username", "email", "hospital"]
 
 
 class CustomTokenCreateSerializer(serializers.Serializer):
@@ -79,11 +79,11 @@ class CustomTokenCreateSerializer(serializers.Serializer):
             "access": str(refresh.access_token),
             "user": {
                 "id": user.id,
+                "full_name": user.first_name + " " + user.last_name,
                 "username": user.username,
                 "is_hospital_admin": user.is_hospital_admin,
-                "is_superuser": user.is_superuser,
-                "full_name": user.first_name + " " + user.last_name,
                 "hospital_id": user.hospital_id,
+                "is_superuser": user.is_superuser,
             },
         }
 
