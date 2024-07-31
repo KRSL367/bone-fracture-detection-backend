@@ -170,6 +170,10 @@ SIMPLE_JWT = {
 
 AUTH_USER_MODEL = "core.User"
 
+DOMAIN = "localhost:5173"
+SITE_NAME = "BoneFractureDetector"
+
+
 DJOSER = {
     "SERIALIZERS": {
         "user_create": "core.serializers.UserCreateSerializer",
