@@ -45,8 +45,9 @@ INSTALLED_APPS = [
     # Third party apps
     "rest_framework",
     "debug_toolbar",
-    "drf_yasg",
+    'django_filters',
     "djoser",
+    "drf_yasg",
     'corsheaders',
 
     # Local apps
