@@ -1,4 +1,6 @@
 from rest_framework import viewsets
+
+from laboratory.pagination import DefaultPagination
 from .models import Patient, MedicalData, DiagnosisReport, Hospital, MedicalDataImages, DiagnosisReportImages
 from .serializers import (
     PatientSerializer,
@@ -13,11 +15,13 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 class HospitalViewSet(viewsets.ModelViewSet):
     queryset = Hospital.objects.all()
     serializer_class = HospitalSerializer
-    permission_classes = [IsAdminUser] 
+    permission_classes = [IsAdminUser]
+    pagination_class = DefaultPagination
 
 class PatientViewSet(viewsets.ModelViewSet):
     serializer_class = PatientSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = DefaultPagination
 
     def get_queryset(self):
         return Patient.objects.filter(hospital_id=self.kwargs['hospital_pk'])
@@ -25,6 +29,7 @@ class PatientViewSet(viewsets.ModelViewSet):
 class MedicalDataViewSet(viewsets.ModelViewSet):
     serializer_class = MedicalDataSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = DefaultPagination
 
     def get_queryset(self):
         return MedicalData.objects.filter(patient_id=self.kwargs['patient_pk'])
