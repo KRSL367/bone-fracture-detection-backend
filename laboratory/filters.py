@@ -14,7 +14,7 @@ class MedicalDataFilter(FilterSet):
         model = MedicalData
         fields = {
             'uploaded_at': ['lt', 'gt'],
-            'patient': ['exact'],
+            "patient_id": ["exact"],
         }
 
 class DiagnosisReportFilter(FilterSet):
@@ -22,5 +22,5 @@ class DiagnosisReportFilter(FilterSet):
         model = DiagnosisReport
         fields = {
             'created_at': ['lt', 'gt'],
-            'patient': ['exact'],
+            "medical_data_id": ["exact"],
         }
