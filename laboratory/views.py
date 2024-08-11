@@ -1,4 +1,8 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.filters import SearchFilter, OrderingFilter
+from laboratory.pagination import DefaultPagination
 from .models import Patient, MedicalData, DiagnosisReport, Hospital, MedicalDataImages, DiagnosisReportImages
 from .serializers import (
     PatientSerializer,
@@ -8,16 +12,27 @@ from .serializers import (
     MedicalDataImagesSerializer,
     DiagnosisReportImageSerializer
 )
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from .filters import DiagnosisReportFilter,MedicalDataFilter,PatientFilter
 
 class HospitalViewSet(viewsets.ModelViewSet):
     queryset = Hospital.objects.all()
     serializer_class = HospitalSerializer
-    permission_classes = [IsAdminUser] 
+    permission_classes = [IsAdminUser]
+    pagination_class = DefaultPagination
+    filter_backends = [SearchFilter, OrderingFilter, DjangoFilterBackend]
+    search_fields = ['name']
+    ordering_fields = ['name']
+    filterset_fields = ['name']
 
 class PatientViewSet(viewsets.ModelViewSet):
     serializer_class = PatientSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = DefaultPagination
+    filter_backends = [SearchFilter, OrderingFilter, DjangoFilterBackend]
+    filterset_class = PatientFilter
+    search_fields = ["first_name", "last_name", "phone", "email"]
+    ordering_fields = ["first_name"]
+ 
 
     def get_queryset(self):
         return Patient.objects.filter(hospital_id=self.kwargs['hospital_pk'])
@@ -25,6 +40,11 @@ class PatientViewSet(viewsets.ModelViewSet):
 class MedicalDataViewSet(viewsets.ModelViewSet):
     serializer_class = MedicalDataSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = DefaultPagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = MedicalDataFilter
+    search_fields = ["description"]
+    ordering_fields = ["uploaded_at"]
 
     def get_queryset(self):
         return MedicalData.objects.filter(patient_id=self.kwargs['patient_pk'])
@@ -39,6 +59,11 @@ class MedicalDataImagesViewSet(viewsets.ModelViewSet):
 class DiagnosisReportViewSet(viewsets.ModelViewSet):
     serializer_class = DiagnosisReportSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [SearchFilter,
+        OrderingFilter,DjangoFilterBackend]
+    filterset_class = DiagnosisReportFilter
+    search_fields = ["report"]
+    ordering_fields = ["created_at"]
 
     def get_queryset(self):
         return DiagnosisReport.objects.filter(medical_data_id=self.kwargs['medical_data_pk'])

@@ -45,8 +45,9 @@ INSTALLED_APPS = [
     # Third party apps
     "rest_framework",
     "debug_toolbar",
-    "drf_yasg",
+    'django_filters',
     "djoser",
+    "drf_yasg",
     'corsheaders',
 
     # Local apps
@@ -172,7 +173,6 @@ AUTH_USER_MODEL = "core.User"
 
 DOMAIN = "localhost:5173"
 SITE_NAME = "BoneFractureDetector"
-
 
 DJOSER = {
     "SERIALIZERS": {
