@@ -15,14 +15,22 @@ from .serializers import (
 from .filters import DiagnosisReportFilter,MedicalDataFilter,PatientFilter
 
 class HospitalViewSet(viewsets.ModelViewSet):
-    queryset = Hospital.objects.all()
     serializer_class = HospitalSerializer
-    permission_classes = [IsAdminUser]
     pagination_class = DefaultPagination
     filter_backends = [SearchFilter, OrderingFilter, DjangoFilterBackend]
     search_fields = ['name']
     ordering_fields = ['name']
     filterset_fields = ['name']
+    
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_superuser:
+            return Hospital.objects.all()
+        elif user.is_hospital_admin:
+            hospital = Hospital.objects.filter(name=user.hospital)
+            return hospital
+        else:
+            return Hospital.objects.filter(name=user.hospital)
 
 class PatientViewSet(viewsets.ModelViewSet):
     serializer_class = PatientSerializer
