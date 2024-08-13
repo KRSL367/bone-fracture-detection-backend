@@ -45,7 +45,7 @@ class UserSerializer(BaseUserSerializer):
 
     class Meta(BaseUserSerializer.Meta):
         model = User
-        fields = ["id", "first_name", "last_name","username", "email", "hospital"]
+        fields = ["id", "first_name", "last_name","username", "email", "hospital","is_hospital_admin", "is_superuser"]
 
 
 class CustomTokenCreateSerializer(serializers.Serializer):
