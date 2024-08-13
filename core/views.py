@@ -3,12 +3,19 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.views import TokenObtainPairView
+from django_filters.rest_framework import DjangoFilterBackend
+
+from laboratory.pagination import DefaultPagination
 from .serializers import CustomTokenCreateSerializer, UserSerializer, UserCreateSerializer
 from .permissions import IsHospitalAdmin
 from .models import User
 
 class UserViewSet(DjoserUserViewSet):
     serializer_class = UserSerializer
+    pagination_class = DefaultPagination
+    filter_backends = [DjangoFilterBackend]
+    search_fields = ["first_name", "last_name", "phone", "email"]
+    ordering_fields = ["first_name"]
 
     def get_queryset(self):
         user = self.request.user
