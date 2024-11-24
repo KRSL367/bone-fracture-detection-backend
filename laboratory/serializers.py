@@ -34,7 +34,7 @@ class MedicalDataSerializer(serializers.ModelSerializer):
 
 class PatientSerializer(serializers.ModelSerializer):
     medical_datas = MedicalDataSerializer(many=True, read_only=True)
-    hospital = HospitalSerializer(read_only=True)
+    hospital = HospitalSerializer
     
     class Meta:
         model = Patient
