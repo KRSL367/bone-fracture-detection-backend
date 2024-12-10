@@ -42,4 +42,5 @@ class DiagnosisReport(models.Model):
 
 class DiagnosisReportImages(models.Model):
     image = models.ImageField(upload_to='report_images/')
+    description = models.TextField()
     diagnosis_report = models.ForeignKey(DiagnosisReport, related_name='diagnosis_images', on_delete=models.CASCADE)
