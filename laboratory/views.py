@@ -9,6 +9,26 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
+from io import BytesIO
+
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from rest_framework import status
+
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import (
+    SimpleDocTemplate, 
+    Paragraph, 
+    Spacer, 
+    Table, 
+    TableStyle, 
+    Image
+)
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from laboratory.pagination import DefaultPagination
 from .models import Patient, MedicalData, DiagnosisReport, Hospital, MedicalDataImages, DiagnosisReportImages
 from .serializers import (
@@ -107,7 +127,7 @@ class MedicalDataImagesViewSet(viewsets.ModelViewSet):
             return Response({"error": "Medical ID not provided"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # Fetch images associated with the blood test ID
+            # Fetch images associated with the medical_datas ID
             images = MedicalDataImages.objects.filter(medical_data_id=medical_id)
             if not images.exists():
                 return Response({"error": "No images found for the provided Medical ID"}, status=status.HTTP_404_NOT_FOUND)
@@ -128,7 +148,6 @@ class MedicalDataImagesViewSet(viewsets.ModelViewSet):
         x_ray_api_url = 'http://127.0.0.1:7001/process_images/'
 
         try:
-            # Send POST request to blood cell count FastAPI
             response_x_ray = requests.post(x_ray_api_url, json=data,  # Pass data as JSON
                 headers={"Content-Type": "application/json"})
             response_x_ray.raise_for_status()
@@ -172,9 +191,6 @@ class MedicalDataImagesViewSet(viewsets.ModelViewSet):
             return Response({"error": error_message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
-
-
 class DiagnosisReportViewSet(viewsets.ModelViewSet):
     serializer_class = DiagnosisReportSerializer
     permission_classes = [IsAuthenticated]
@@ -186,6 +202,133 @@ class DiagnosisReportViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return DiagnosisReport.objects.filter(medical_data_id=self.kwargs['medical_data_pk'])
+    
+    
+    @action(detail=True, methods=["get"], url_path="generate-fractured-report")
+    def generate_fractured_report(self, request, *args, **kwargs):
+        diagnosis_id = request.query_params.get('diagnosis_id')
+        
+        if not diagnosis_id:
+            return Response({"error": "diagnosis_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        hospital_id = self.kwargs.get("hospital_pk")
+        return self.generate_pdf_response(hospital_id, diagnosis_id)
+
+    def generate_pdf_response(self, hospital_id, diagnosis_id):
+        hospital = get_object_or_404(Hospital, id=hospital_id)
+        diagnosis_report = get_object_or_404(DiagnosisReport, id=diagnosis_id)
+        medical_datas = diagnosis_report.medical_data
+        patient = medical_datas.patient
+        diagnosis_result_images = DiagnosisReportImages.objects.filter(diagnosis_report=diagnosis_report)
+
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=letter)
+
+        styles = getSampleStyleSheet()
+        style_header = ParagraphStyle('Header', parent=styles['Heading1'], fontSize=24, alignment=1, spaceAfter=12)
+        style_section_heading = ParagraphStyle('SectionHeading', parent=styles['Heading2'], fontSize=20, spaceAfter=6)
+        style_footer = ParagraphStyle('Footer', parent=styles['Normal'], fontSize=14, alignment=1, spaceBefore=40)
+
+        content = []
+
+        # Header
+        content.append(Paragraph(hospital.name, style_header))
+        if hospital.phone:
+            content.append(Paragraph(f"Phone: {hospital.phone}", styles['Normal']))
+        content.append(Spacer(1, 12))
+
+        # Patient Information
+        content.append(Paragraph("Patient Information", style_section_heading))
+        patient_info = [
+            ["Name:", f"{patient.first_name} {patient.last_name}"],
+            ["Email:", patient.email or "N/A"],
+            ["Phone:", patient.phone or "N/A"],
+            ["Birth Date:", patient.birth_date or "N/A"]
+        ]
+        table = Table(patient_info, colWidths=[2 * inch, 4 * inch])
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (0, -1), colors.lightblue),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('BOX', (0, 0), (-1, -1), 1, colors.black),
+            ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+        ]))
+        content.append(table)
+        content.append(Spacer(1, 12))
+
+        # Test Details
+        content.append(Paragraph("Test Details", style_section_heading))
+        test_details = [
+            ["Description:", medical_datas.description or "N/A"],
+            ["Registered At:", medical_datas.uploaded_at.strftime("%Y-%m-%d %H:%M") if medical_datas.uploaded_at else "N/A"]
+        ]
+        table = Table(test_details, colWidths=[2 * inch, 4 * inch])
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (0, -1), colors.lightblue),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('BOX', (0, 0), (-1, -1), 1, colors.black),
+            ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+        ]))
+        content.append(table)
+        content.append(Spacer(1, 12))
+
+        # Diagnosis Report
+        content.append(Paragraph("Diagnosis Report", style_section_heading))
+        report_summary = [["Summary:", diagnosis_report.report or "N/A"]]
+        table = Table(report_summary, colWidths=[2 * inch, 4 * inch])
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (0, -1), colors.lightblue),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('BOX', (0, 0), (-1, -1), 1, colors.black),
+            ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+        ]))
+        content.append(table)
+        content.append(Spacer(1, 12))
+
+        # Result Images
+        content.append(Paragraph("Result Images", style_section_heading))
+        if diagnosis_result_images.exists():
+            image_table_data = []
+            row = []
+            for i, img in enumerate(diagnosis_result_images):
+                img_file = img.image
+                try:
+                    if hasattr(img_file, 'read'):
+                        image = Image(BytesIO(img_file.read()), width=2 * inch, height=2 * inch)
+                    else:
+                        image = Image(img_file.path, width=2 * inch, height=2 * inch)
+                    row.append(image)
+                    if len(row) == 3:
+                        image_table_data.append(row)
+                        row = []
+                except Exception as e:
+                    print(f"Error loading image: {e}")
+            if row:
+                image_table_data.append(row)
+
+            image_table = Table(image_table_data, colWidths=[2 * inch] * 3)
+            image_table.setStyle(TableStyle([
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+            ]))
+            content.append(image_table)
+
+        # Footer
+        content.append(Spacer(1, 12))
+        content.append(Paragraph("End of Report", style_footer))
+
+        doc.build(content)
+        pdf_data = buffer.getvalue()
+        buffer.close()
+
+        response = HttpResponse(pdf_data, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{patient.first_name}_{patient.last_name}_report.pdf"'
+        return response
+
+
 
 class DiagnosisReportImageViewSet(viewsets.ModelViewSet):
     serializer_class = DiagnosisReportImageSerializer
@@ -193,3 +336,4 @@ class DiagnosisReportImageViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return DiagnosisReportImages.objects.filter(diagnosis_report_id=self.kwargs['diagnosis_report_pk'])
+    
